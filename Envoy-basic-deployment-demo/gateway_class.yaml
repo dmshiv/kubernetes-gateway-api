@@ -1,0 +1,24 @@
+# 🏭 GATEWAYCLASS = FACTORY BLUEPRINT
+# 
+# Think of it like:
+# - Car manufacturer (Toyota, BMW, Tesla)
+# - Phone brand (iPhone, Samsung, Google Pixel)
+# - Gateway provider (Envoy, Istio, NGINX)
+#
+# GatewayClass says: "When you want a gateway, WHO should build it?"
+# Here we're saying: "Envoy Gateway company will build our gateways"
+#
+# Real-world example:
+# You want a car → You choose manufacturer (Toyota) → They build your specific car
+# You want a gateway → You choose provider (Envoy) → They build your specific gateway
+
+
+apiVersion: gateway.networking.k8s.io/v1  # Gateway API version
+kind: GatewayClass  # Type: Blueprint/Factory for building gateways
+metadata:
+  name: eg  # Factory name: "eg" (short for Envoy Gateway)
+spec:
+  controllerName: gateway.envoyproxy.io/gatewayclass-controller  # The actual factory worker (Envoy's controller)
+
+
+##gatewayclass name is "eg"

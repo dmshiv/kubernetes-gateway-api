@@ -1,0 +1,44 @@
+# SECOND BACKEND DEPLOYMENT
+# "Run a second version of the app for A/B testing or gradual rollouts"
+# Creates backend-2 pod (different from backend)
+# Used for traffic splitting scenarios
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-2  # Different name from main backend
+spec:
+  replicas: 1  # Run 1 copy
+  selector:
+    matchLabels:
+      app: backend-2  # Find pods with this label
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: backend-2  # Label for this pod
+        version: v1
+    spec:
+      serviceAccountName: backend-2  # Identity for this pod
+      containers:
+        - image: nginxdemos/hello:latest  # Using same image as backend
+          imagePullPolicy: IfNotPresent  # Use cached image if available
+          name: backend-2  # Container name
+          ports:
+            - containerPort: 80  # App listens on port 80
+          env:  # Environment variables passed to container
+            - name: POD_NAME  # Pass pod name to app
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: NAMESPACE  # Pass namespace to app
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          resources:  # CPU and memory limits
+            requests:  # Minimum guaranteed resources
+              cpu: "100m"  # 0.1 CPU core minimum
+              memory: "128Mi"  # 128 MB RAM minimum
+            limits:  # Maximum allowed resources
+              cpu: "200m"  # 0.2 CPU core maximum
+              memory: "256Mi"  # 256 MB RAM maximum

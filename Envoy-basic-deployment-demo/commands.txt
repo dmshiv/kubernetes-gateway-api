@@ -1,0 +1,47 @@
+kubectl port-forward svc/envoy-default-eg-e41e7b31 9090:80 -n envoy-gateway-system --address 0.0.0.0
+
+Port-forward is needed ONLY because:
+
+LoadBalancer doesn't get an external IP on bare metal
+NodePort gives you port 32642 (high port)
+Port-forward lets you use a nicer port like 9090
+
+kubectl get svc envoy-default-eg-e41e7b31 -n envoy-gateway-system
+NAME                        TYPE           CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+envoy-default-eg-e41e7b31   LoadBalancer   10.102.241.51   <pending>     80:32642/TCP   95m
+
+diff between port-forward and NodePort/LoadBalancer:
+
+You're absolutely right! Both are accessible only on your system. The difference is minimal:
+
+NodePort (32642):
+
+Direct access to Kubernetes service
+Port assigned by Kubernetes (range 30000-32767)
+No extra process needed
+curl http://www.example.com:32642
+Port-forward (9090):
+
+Creates a tunnel through kubectl
+You choose the port (9090)
+Requires kubectl process running
+curl http://www.example.com:9090
+Real difference:
+
+NodePort: Ugly port number (32642) but always available
+Port-forward: Nice port number (9090) but requires kubectl running
+In production (cloud/real environment):
+
+LoadBalancer would get a real external IP
+Then you could access from anywhere (not just your system)
+Port would be standard (80/443)
+On bare metal both are local-only anyway! So use whichever you prefer:
+
+NodePort 32642 - simpler, no extra process
+Port-forward 9090 - nicer port number
+There's no real advantage of one over the other in your bare metal setup. 
+Both are localhost-only access!
+
+kubectl get svc -n envoy-gateway-system | grep envoy-default
+envoy-default-eg-e41e7b31         LoadBalancer   10.102.241.51   <pending>     80:30080/TCP                                       2d2h
+envoy-default-high-way-561b08e5   LoadBalancer   10.110.208.73   <pending>     80:32089/TCP                                       2m40s

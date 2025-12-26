@@ -1,0 +1,37 @@
+
+
+
+
+# WEIGHTED TRAFFIC ROUTING (80/20)
+# "Send 80% traffic to backend, 20% to backend-2"
+# Out of 10 requests:
+#   - 8 go to backend (old stable version)
+#   - 2 go to backend-2 (new version being tested)
+# Use case: Canary deployments, gradual rollouts with control
+
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: http-headers  # Name of this routing rule
+spec:
+  parentRefs:
+  - name: high-way  # Attach to Gateway 'high-way'
+  hostnames:
+  - arena.com  # Only for requests to this hostname
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix  # Match all paths starting with
+        value: /  # / (means everything)
+    backendRefs:  # Route with specific weights
+    - group: ""  # Core Kubernetes group
+      kind: Service  # It's a Service resource
+      name: backend  # Old version
+      port: 80
+      weight: 8  # Gets 80% of traffic (8 out of 10)
+    - group: ""
+      kind: Service
+      name: backend-2  # New version
+      port: 80
+      weight: 2  # Gets 20% of traffic (2 out of 10)

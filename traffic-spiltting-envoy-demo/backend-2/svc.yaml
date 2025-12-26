@@ -1,0 +1,19 @@
+# SECOND BACKEND SERVICE
+# "Create stable address for backend-2 pods"
+# Routes traffic to pods with label app=backend-2
+# Used by HTTPRoute for traffic splitting
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-2  # Service name (used in HTTPRoute)
+  labels:
+    app: backend-2  # Labels for the service itself
+    service: backend-2
+spec:
+  ports:
+    - name: http  # Port name
+      port: 80  # Service port (what others use to reach it)
+      targetPort: 80  # Pod port (where app actually listens)
+  selector:
+    app: backend-2  # Find and route to pods with this label

@@ -1,0 +1,11 @@
+# "Give the backend pod an identity/permission"
+# Like an ID card for the pod
+# Allows pod to talk to Kubernetes API if needed
+# Not critical for basic apps
+
+
+
+apiVersion: v1  # ServiceAccount API version
+kind: ServiceAccount  # Type: Identity for pods
+metadata:
+  name: backend  # ServiceAccount name (used in Deployment)

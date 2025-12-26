@@ -1,0 +1,39 @@
+# "Run 1 copy of nginxdemos/hello app on port 80"
+# Creates the actual application pod
+# Pod runs the web server (nginxdemos/hello)
+# Labels: app=backend (used by Service to find it)
+
+
+
+
+---
+apiVersion: apps/v1  # Deployment API version
+kind: Deployment  # Type: Manages pods
+metadata:
+  name: backend  # Deployment name
+spec:
+  replicas: 1  # Run 1 pod
+  selector:  # How to find pods managed by this deployment
+    matchLabels:
+      app: backend  # Find pods with label app=backend
+      version: v1  # Find pods with label version=v1
+  template:  # Pod template (blueprint for creating pods)
+    metadata:
+      labels:  # Labels applied to pods
+        app: backend  # Label: app=backend
+        version: v1  # Label: version=v1
+    spec:
+      serviceAccountName: backend  # Identity for this pod
+      containers:  # List of containers in pod
+        - image: nginxdemos/hello:latest  # Container image
+          imagePullPolicy: IfNotPresent  # Use cached if available
+          name: backend  # Container name
+          ports:  # Ports exposed by container
+            - containerPort: 80  # App listens on port 80
+          resources:  # CPU and memory limits
+            requests:  # Minimum guaranteed resources
+              cpu: "100m"  # 0.1 CPU core minimum
+              memory: "128Mi"  # 128 MB RAM minimum
+            limits:  # Maximum allowed resources
+              cpu: "200m"  # 0.2 CPU core maximum
+              memory: "256Mi"  # 256 MB RAM maximum

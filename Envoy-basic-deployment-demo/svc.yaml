@@ -1,0 +1,23 @@
+# "Create a stable address for backend pods"
+
+# Load balances to pods with label app=backend
+# Port 80 inside cluster
+# ClusterIP (internal only)
+
+
+
+---
+apiVersion: v1  # Service API version
+kind: Service  # Type: Stable network endpoint
+metadata:
+  name: backend  # Service name (used in HTTPRoute)
+  labels:  # Labels for the service itself
+    app: backend  # Label: app=backend
+    service: backend  # Label: service=backend
+spec:
+  ports:  # Ports exposed by service
+    - name: http  # Port name
+      port: 80  # Service port (what others connect to)
+      targetPort: 80  # Pod port (where app listens)
+  selector:  # Which pods to route traffic to
+    app: backend  # Route to pods with label app=backend

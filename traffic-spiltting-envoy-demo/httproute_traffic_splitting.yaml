@@ -1,0 +1,32 @@
+# TRAFFIC SPLITTING (50/50)
+# "Split traffic equally between backend and backend-2"
+# Request 1 → backend
+# Request 2 → backend-2
+# Request 3 → backend
+# Use case: A/B testing, gradual rollouts
+
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: http-headers  # Name of this routing rule
+spec:
+  parentRefs:
+  - name: high-way  # Attach to Gateway 'high-way'
+  hostnames:
+  - gladiators.com  # Only for requests to this hostname
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix  # Match all paths starting with
+        value: /  # / (means everything)
+    backendRefs:  # Split traffic between multiple backends
+    - group: ""  # Core Kubernetes group
+      kind: Service  # It's a Service resource
+      name: backend  # First backend (gets 50% traffic)
+      port: 80
+    - group: ""
+      kind: Service
+      name: backend-2  # Second backend (gets 50% traffic)
+      port: 80
+

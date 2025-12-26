@@ -1,0 +1,22 @@
+# Patch to set custom NodePort for Gateway service
+# Apply after the Gateway is created
+
+# "Change the auto-generated port to 30080"
+
+# Patches the Gateway service after it's created
+# Sets NodePort to 30080 (instead of random like 32642)
+
+
+
+apiVersion: v1  # Service API version
+kind: Service  # Type: Patch existing service
+metadata:
+  name: envoy-default-eg-e41e7b31  # Auto-created Gateway Service name
+  namespace: envoy-gateway-system  # Gateway controller namespace
+spec:
+  type: NodePort  # Service type: NodePort (external access)
+  ports:  # Port configuration
+    - port: 80  # Service port (external)
+      targetPort: 10080  # Envoy proxy pod port (internal)
+      nodePort: 30080  # Custom NodePort (access via host:30080)
+      protocol: TCP  # TCP protocol

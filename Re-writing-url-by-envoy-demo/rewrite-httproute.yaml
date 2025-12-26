@@ -1,0 +1,32 @@
+# HOSTNAME REWRITE EXAMPLE
+# "When user visits spartacus.com, rewrite hostname to House-of-ashur.com before sending to backend"
+# User browser shows: spartacus.com
+# Backend receives request with hostname: House-of-ashur.com
+# Use case: Rebrand old domain while backend uses new domain
+
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: http-filter-url-rewrite  # Name of this routing rule
+spec:
+  parentRefs:
+    - name: high-way  # Attach to Gateway 'high-way'
+  hostnames:
+    - house-of-batiatis.com  # Listen for requests to this hostname
+  rules:
+    - matches:
+      - path:
+          type: PathPrefix  # Match all paths
+          value: /  # Starting with /
+      filters:
+      - type: URLRewrite  # Apply URL rewriting
+        urlRewrite:
+          hostname: house-of-ashur.com  # Change hostname to this
+      backendRefs:
+      - name: backend  # Send modified request to backend service
+        port: 80  # Backend port
+
+# About the hostname rewrite: The rewrite happens internally - the 
+# browser will ALWAYS show what you typed. The hostname change 
+# is only visible to the backend application in the HTTP Host header.

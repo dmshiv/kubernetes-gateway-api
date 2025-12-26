@@ -1,0 +1,31 @@
+# "If request comes for spartacus.com, send it to backend service"
+# Routing rules for the Gateway
+# Hostname match: spartacus.com
+# Path match: / (all paths)
+# Destination: backend service port 80
+
+
+
+
+
+
+apiVersion: gateway.networking.k8s.io/v1  # Gateway API version
+kind: HTTPRoute  # Type: HTTP routing rules
+metadata:
+  name: backend  # Name of this route
+spec:
+  parentRefs:  # Which Gateway to attach to
+    - name: high-way  # Attach to Gateway named 'high-way'
+  hostnames:  # Only apply for these hostnames
+    - "spartacus.com"  # Match requests for spartacus.com
+  rules:  # List of routing rules
+    - backendRefs:  # Where to send the traffic
+        - group: ""  # Core Kubernetes API group
+          kind: Service  # Target is a Service
+          name: backend  # Service name: backend
+          port: 80  # Service port: 80
+          weight: 1  # 100% of traffic (weight: 1 out of 1)
+      matches:  # When to apply this rule
+        - path:  # Path matching
+            type: PathPrefix  # Match paths starting with
+            value: /  # Root path (matches everything)
